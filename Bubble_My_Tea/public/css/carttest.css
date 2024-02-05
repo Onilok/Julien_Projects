@@ -1,0 +1,72 @@
+.dropdown:hover > #cart-dropdown{
+    display: block;
+}
+
+
+body{
+    background-color: #CDCCF9
+}
+
+
+.container {
+    background: #fff;
+    width: 540px;
+    height: 500px;
+    margin: 0 auto;
+    position: relative;
+    margin-top: 10%;
+    box-shadow: 2px 5px 20px
+    rgba(119,119,119.5);
+    border-radius: 15px;
+    flex-direction: space-evenly;
+}
+
+.test{
+    color: black;
+    display: flex;
+    justify-content: center;
+    margin: 50px;
+}
+
+.title{
+
+    display: flex;
+    flex-direction: column;
+    margin: 0 10%;
+    
+}
+
+table{
+    border: 1px solid black;
+    padding: 5px;
+    margin-bottom: 59px;
+  }
+  td,th{
+    border: 1px solid black;
+    padding: 5px;
+
+  }
+  #total{
+
+    margin-left: 190px;
+  }
+
+  .button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin-top: auto;
+    
+    padding: 16px;
+    color: #000;
+    background: transparent;
+    box-shadow: 0px 0px 0px 1px black inset;
+    transition: background 0.4s ease;
+    
+  }
+  
+  .button:hover {
+    background: #CDCCF9;
+  }
+  

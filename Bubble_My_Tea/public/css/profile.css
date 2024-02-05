@@ -1,0 +1,240 @@
+body {
+    background: linear-gradient(to right, #CDCCF9, #CDCCF9);
+    overflow-x: hidden;
+}
+
+nav a {
+    list-style: none;
+    padding: 35px;
+    color: #fff;
+    font-size: 1.1em;
+    display: block;
+    transition: all .3s ease-in-out;
+}
+nav a:hover {
+    color: #9917ab;
+    cursor: pointer;
+    transform: scale(1,2);
+}
+nav a:first-child {
+    margin-top: 7px;
+}
+nav a.active {
+    color: #fff;
+ 
+}
+
+.container {
+    background : white;
+    width: 540px;
+    height: 490px;
+    margin: 0 auto;
+    position: relative;
+    margin-top: 10%;
+    box-shadow: 2px 5px 20px
+    rgba(119,119,119.5);
+    border-radius: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    padding: 10px;
+}
+
+.title-container{
+    text-align: center;
+    width: 100%;
+}
+
+.column{
+    width: 45%;
+    height: 100%;
+    margin-left: 5%;
+}
+
+.profile {
+    transition: all .5s ease-in;
+    width: 80%;   
+}
+
+h1 {
+    font-family: 'Georgia', sans-serif;
+    color: #070707;
+    font-size: 1.2rem;
+    margin-top: 35px;
+    margin-bottom: 45px;
+}
+
+.h2 {
+    color: #CDCCF9;
+    font-family: "Georgia", sans-serif;
+   font-family: 'montserrat', sans-serif;
+    color: #9917ab;
+    font-size: 1.2rem;
+    margin-top: 40px;
+    margin-bottom: 35px;
+}
+
+h3 {
+    font-family: 'Georgia', sans-serif;
+    color: #090707;
+    font-size: 1.2rem;
+    margin-top: 32px;
+    margin-bottom: 0.9px;
+    
+}
+.imput, p {
+    border: 0;
+    border-bottom: 1px solid #3fb6a8;
+    width: 80%;
+    font-family: 'Georgia', sans-serif;
+    font-size: .7em;
+    padding: 7px 0;
+    color: #070707;
+    outline: none;
+}
+span {
+    font-size: .7em;
+    color: #777;
+}
+
+.btn {
+    font-family: "roboto", sans-serif;
+    text-transform: uppercase;
+    font-size: 15px;
+    border: 0;
+    color: #fff;
+    background: #CDCCF9;
+    padding: 7px 15px;
+    box-shadow: 0px 2px 4px 0
+    rgba(0,0,0,.2);
+    cursor: pointer;
+    margin-top: 40px;
+    border-radius: 15px;
+}
+
+.tabShow {
+    display: flex;
+    flex-direction: row-reverse;
+    background-color: #9917ab;
+}
+
+.rightbox{
+    background-color: aqua;
+}
+
+.name-inputs {
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: center;
+    width: 50%;
+}
+
+.input-group {
+    width: 48%;
+}
+
+.input-group label {
+    margin-bottom: 5px; 
+}
+.rightbox {
+    width: 60%;
+    margin: 10% auto; 
+    padding-top: 5px;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+}
+/* .profile label,
+.profile input,
+.profile button {
+    margin-bottom: 25px;
+} */
+.input {
+    border-radius: 20px;
+    width: 70%; /* Ajustez selon vos préférences */
+    box-sizing: border-box; /* Pour inclure le padding et la bordure dans la largeur totale */
+    padding: 5px;
+    font-family: 'Georgia', sans-serif;
+    font-size: 1em;
+    color: #070707;
+    outline: none;
+
+}
+
+
+.rightbox {
+    width: 80%; /* Ajustez selon vos préférences */
+    margin: 0 auto; /* Utilisez 'auto' pour centrer horizontalement */
+    padding-top: 5px;
+}
+.header {
+    width: 100%;
+    background-color:whitesmoke ;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.header>ul{
+    margin: 0px ;
+    padding: 30px;
+}
+
+.header > ul::after{
+content: "";
+display: block;
+clear: both;
+}
+
+.header > ul >li{
+float: right;
+right: 10%;
+position: relative;
+}
+
+.header > ul > li >a{
+padding: 20px 30px;
+color: #000000;
+
+}
+
+.header> li {
+list-style-type: none;
+}
+
+.submenu {
+display: none;
+}
+
+.header a {
+display: inline-block; 
+text-decoration:none ;
+}
+
+
+
+.header li:hover .submenu {
+display: inline-block;
+position: absolute;
+top: 100%;
+left: 0px;
+padding: 0px;
+z-index: 1000;
+}
+
+.submenu li{
+border-bottom: 1px solid #000000;
+}
+
+.submenu li a{
+padding: 20px 30px;
+font-size: 13px;
+color: #000000;
+width: 270px;
+
+}
+.logo img {
+    position: absolute;
+    top: 0px;
+    left: 10px;
+    height: 150px;
+    margin: 0px 0;
+}
+

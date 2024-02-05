@@ -1,0 +1,285 @@
+
+    
+    body {
+        font-family: 'Source code pro', arial, serif;
+        margin: 0px;
+        padding: 0px;
+        background-color:#CDCCF9;
+        background-size: 400% 400%;
+        animation: gradient 15s ease infinite;
+        height: 150vh;
+        justify-content: center;
+        align-items: center;
+        min-height: 50vh;
+    
+        
+    }
+
+    .wrapper{
+        width: 340px;
+        height: 350px;
+        background:whitesmoke;
+        border: 2px solid  rgba(255 ,255 ,255, .2);
+        backdrop-filter: blur(20px);
+        box-shadow: 0 0 10px rgba(0, 0, 0 , .2);
+        color: #fff;
+        border-radius: 10px;
+        padding: 30px 40px;
+        position: absolute;
+        top: 45%;
+        left: 35%;
+    }
+
+    .wrapper h1{
+        font-size:30px;
+        text-align:center;
+        color: #000000;
+    }
+
+    .wrapper .input-box{
+        position: relative;
+       width: 100%; 
+       height: 50px;
+       background:transparent;
+       margin: 30px 0;
+
+
+    }
+
+    .input-box input{
+        width: 100%;
+        height: 100%;
+        background: transparent;
+        border: none;
+        outline: none;
+        border: 2px solid #333;
+        box-shadow: 0 0 10px rgb(147, 143, 143);
+        border-radius: 40px;
+        font-size: 16px;
+        color: #000000;
+        
+
+    }
+
+    
+
+    .input-box input::placeholder{
+        color:#000000;
+    }
+
+    .input-box i {
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 20px;
+        color: #000000;
+    }
+
+    .wrapper .remember-forgot{
+        display: flex;
+        justify-content: space-between;
+        font-size: 14.5px;
+        margin: -15px 0 15px;
+        color: #000000;
+ 
+ 
+     }
+
+     .remember-forgot label input{
+        accent-color: #000000;
+        margin-right: 3px;
+     }
+
+     .remember-forgot a {
+        color:#000000;
+        text-decoration: none;  
+     }
+
+     .remember-forgot a:hover {
+        text-decoration: underline;
+     }
+
+     .wrapper .btn {
+        width: 100%;
+        height: 45px;
+        background: #fff;
+        border: none;
+        outline: none;
+        border-radius: 40px;
+        box-shadow: 0 0 10px rgba(0, 0, 0 , 1);
+        cursor: pointer;
+        font-size: 16px;
+        color: #333;
+        font-weight: 600;
+
+    }
+
+    .register-link{
+        color:#000000;
+        text-decoration: none; 
+        margin-top: 30px;
+       
+    }
+
+
+    
+    
+    .bannière{
+        width: 100%;
+        background-color:whitesmoke ;
+        background-color: rgba(0, 0, 0, 0.2);
+    }
+
+   .bannière >ul{
+        margin:0px ;
+        padding: 0px;
+   }
+    
+   .bannière > ul::after{
+    content: "";
+    display: block;
+    clear: both;
+   }
+
+.bannière > ul >li{
+    float: right;
+    right: 10%;
+    position: relative;
+}
+
+.bannière > ul > li >a{
+    padding: 20px 30px;
+    color: #000000;
+
+}
+
+.bannière > li {
+    list-style-type: none;
+}
+
+.submenu {
+    display: none;
+}
+
+.bannière a{
+   display: inline-block; 
+   text-decoration:none ;
+}
+
+
+
+.bannière li:hover .submenu{
+    display: inline-block;
+    position: absolute;
+    top: 100%;
+    left: 0px;
+    padding: 0px;
+    z-index: 1000;
+}
+
+.submenu li{
+    border-bottom: 1px solid #000000;
+}
+
+.submenu li a{
+   padding: 20px 30px;
+   font-size: 13px;
+   color: #000000;
+   width: 270px;
+
+}
+
+
+
+input{
+    color: black;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-style: none;
+    border-bottom: 1px solid;
+    border-radius: 20px;
+}
+div{
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+}
+#sub input{
+    font-family: comic sans ms, sans-serif;
+    font-size: 1.05em;
+    border-radius: 2px;
+    border-style: none;
+    color: #000000;
+    background-color: rgba(100, 100, 100, 0.6);
+}
+footer{
+    width: 1900px;
+    height: 100px;
+    color: whitesmoke;
+    background-size: contain;
+    background-color: rgba(0, 0, 0, 0.2);
+    position: fixed;
+    
+    bottom: 0;
+    left: 0;
+}
+b{
+    font-family: comic sans ms, sans-serif;
+    padding: 10px;
+    font-size: 1.2em;
+}
+#df{
+    font-size: 1.5em;
+}
+#ft{
+    position: relative;
+    left: 700px;
+}
+#ft a{
+    font-family: comic sans ms, sans-serif;
+    color: #000000;
+}
+#mdpo{
+    color: whitesmoke;
+    text-decoration: underline;
+}
+
+
+
+
+  #background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Pour placer l'image en arrière-plan */
+  }
+
+  .bottom-right {
+    position: absolute;
+    bottom: 140px;
+    right: 5px;
+  }
+
+ * {
+    margin: 0;
+    padding: 0;
+    outline: none;
+  }
+
+  
+  .bottom-left {
+    position: absolute;
+    bottom: 0px;
+    left: 5px;
+  }
+  
+#logo {
+    padding: 30px 40px;
+    position: absolute;
+    top: 0%;
+    left: 35%;
+}
+  
