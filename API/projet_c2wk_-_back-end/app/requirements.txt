@@ -1,0 +1,6 @@
+flask
+redis
+Flask-SQLAlchemy
+Flask-JWT-Extended
+Werkzeug
+mysql-connector-python
