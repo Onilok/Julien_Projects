@@ -1,0 +1,78 @@
+# ------------------------------------
+# Prometheus monitoring 
+# ------------------------------------
+
+# ------------------------------------
+# User creation
+
+- name: Prometheus user creation (no home - no shell)
+  ansible.builtin.user:
+    name: prometheus
+    shell: /usr/sbin/nologin
+    create_home: false
+    system: true
+
+- name: Add bastion user to prometheus group
+  become: true
+  ansible.builtin.user:
+    name: bastion
+    groups: prometheus
+    append: true
+
+# ------------------------------------
+# Prometheus directories
+
+- name: Create Prometheus directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: prometheus
+    group: prometheus
+    mode: '0770'
+  loop:
+    - /opt/prometheus
+    - /opt/node_exporter
+    - /opt/blackbox_exporter
+    - /opt/alertmanager
+
+- name: Create Prometheus data directory
+  ansible.builtin.file:
+    path: /opt/prometheus/data
+    state: directory
+    owner: 65534
+    group: 65534
+    mode: '0777'
+
+- name: Deploy prometheus config Yaml
+  template:
+    src: prometheus.yml.j2
+    dest: /opt/prometheus/prometheus.yml
+    owner: prometheus
+    group: prometheus
+    mode: '0644'
+
+- name: Copy Prometheus docker compose file
+  ansible.builtin.copy:
+    src: docker-compose.yml
+    dest: /home/bastion/docker-compose.yml
+    owner: prometheus
+    group: prometheus
+
+- name: Copy alertmanager.yml file
+  ansible.builtin.copy:
+    src: alertmanager.yml
+    dest: /opt/alertmanager/alertmanager.yml
+    owner: prometheus
+    group: prometheus
+
+
+# ------------------------------------
+# Start Prometheus with docker compose file 
+
+- name: Start containers with Docker Compose 
+  ansible.builtin.command: docker compose up -d
+  args:
+    chdir: /home/bastion
+  register: compose_up
+  changed_when: "'Creating' in compose_up.stdout or 'Recreating' in compose_up.stdout"
+

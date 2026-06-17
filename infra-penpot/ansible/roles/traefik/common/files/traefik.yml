@@ -1,0 +1,40 @@
+log:
+  level: INFO
+
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+  metrics:
+    address: ":9100"
+
+providers:
+  file:
+    filename: "/dynamic.yml"
+
+metrics:
+  prometheus:
+    entryPoint: metrics
+    addEntryPointsLabels: true
+    addRoutersLabels: true
+    addServicesLabels: true
+    buckets:
+      - 0.1
+      - 0.3
+      - 1.2
+      - 5.0
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: "penpot@devops-middleware.fr"
+      storage: acme.json
+      httpChallenge:
+        entryPoint: web
+
+api:
+  dashboard: true
+  insecure: false
+
+accessLog: {}

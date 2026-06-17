@@ -1,0 +1,8 @@
+prometheus_version: "3.9.1"
+prometheus_arch: "linux-amd64"
+prometheus_base_dir: "/opt"
+prometheus_user: "prometheus"
+prometheus_group: "prometheus"
+prometheus_config: "prometheus.yml"
+alertmanager_version: "0.30.0"
+node_exporter_version: "1.10.2"

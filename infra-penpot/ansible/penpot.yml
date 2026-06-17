@@ -1,0 +1,70 @@
+---
+- name: Configure Bastion Hosts
+  hosts: tower
+  become: true
+  roles:
+    - role: tower
+
+- name: Install prd K3s cluster master
+  hosts: k3s_prd_masters:k3s_prd_masters_slave
+  become: true
+  gather_facts: yes
+  serial: 1
+  roles:
+    - k3s
+
+- name: Install Penpot Application on Prod
+  hosts: k3s_prd_masters
+  serial: 1
+  become: true
+  vars_files:
+    - groups_vars/k3s_prd_masters.yml
+  roles:
+    - penpot-prd
+
+- name: Install stg K3s cluster worker
+  hosts: k3s_stg_masters:k3s_stg_workers
+  become: true
+  gather_facts: yes
+  serial: 1
+  roles:
+    - k3s-stg
+
+- name: Install Penpot Application on staging
+  hosts: k3s_stg_masters
+  serial: 1
+  vars_files:
+    - groups_vars/k3s_stg_masters.yml
+  roles:
+    - penpot-stg
+
+- name: Configure Traefik Hosts
+  hosts: traefik
+  become: true
+  roles:
+    - role: traefik/common
+
+- name: Traefik master
+  hosts: penpot-traefik-az1
+  become: true
+  roles:
+    - traefik/master
+
+- name: Traefik slave
+  hosts: penpot-traefik-az2
+  become: true
+  roles:
+    - traefik/slave
+
+- name: Monitoring prometheus bastion
+  hosts: bastion
+  become: true
+  roles:
+    - role: monitoring/bastion
+
+- name: Monitoring prometheus Central
+  hosts: monitoring
+  become: true
+  roles:
+    - monitoring/master
+

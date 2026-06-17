@@ -1,0 +1,44 @@
+stages:
+  - terraform-fmt
+  - ansible-lint
+  - trivy-config
+
+terraform_fmt:
+  stage: terraform-fmt
+  tags:
+    - penpotv3
+  image:
+    name: hashicorp/terraform:1.6
+    entrypoint: [""]
+  script:
+    - echo "Vérification format Terraform"
+    - terraform fmt -recursive
+    - terraform fmt -check -recursive
+
+ansible_lint:
+  stage: ansible-lint
+  tags:
+    - penpotv3
+  image:
+    name: cytopia/ansible-lint:latest
+    entrypoint: [""]
+  script:
+    - echo "Lint Ansible"
+    - ansible-lint .
+
+trivy_iac_scan:
+  stage: trivy-config
+  tags:
+    - penpotv3
+  image:
+    name: aquasec/trivy:latest
+    entrypoint: [""]
+  script:
+    - echo "Scan des fichiers IaC"
+    - trivy config terraform --severity HIGH,CRITICAL --format json --output trivy-iac-report.json || true
+  artifacts:
+    name: "trivy-iac-report"
+    paths:
+      - trivy-iac-report.json
+    when: always
+    expire_in: 7 days

@@ -1,0 +1,56 @@
+---
+- name: Penpot helm installation script
+  copy:
+    src: penpot-helm-install.sh
+    dest: ./deploy-penpot.sh
+    owner: admin
+    group: admin
+    mode: '0750'
+
+- name: File copy penpot-helm-values
+  template:
+    src: files/penpot-helm-values.yml
+    dest: ./penpot-helm-values.yml
+    mode: '0644'
+
+- name: Helm repo add penpot + update
+  become: false
+  environment:
+    PATH: "/usr/local/bin/"
+  kubernetes.core.helm_repository:
+    name: penpot
+    repo_url: http://helm.penpot.app
+    repo_state: present
+    validate_certs: no
+    force_update: true
+
+- name: Helm repo add prometheus-community
+  become: false
+  environment:
+    PATH: "/usr/local/bin/"
+  kubernetes.core.helm_repository:
+    name: prometheus-community
+    repo_url: https://prometheus-community.github.io/helm-charts
+    repo_state: present
+    validate_certs: no
+    force_update: true
+
+- name: Check if penpot is already installed
+  command: /usr/local/bin/helm list -n penpot --filter penpot -q
+  register: penpot_installed
+  ignore_errors: yes
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+
+- name: Deploy Penpot Helm chart
+  become: false
+  command: /home/admin/deploy-penpot.sh
+  when: penpot_installed.stdout == ""
+  register: penpot_install
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+
+- name: Penpot installed message
+  debug:
+    msg: "Penpot has been installed"
+  when: penpot_install.changed

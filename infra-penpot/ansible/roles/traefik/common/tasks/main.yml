@@ -1,0 +1,81 @@
+# Install Docker (official Docker script) and some files needed by traefik
+
+# ---------
+# Apt cache
+# ----------
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+
+# -------------------
+# Docker installation
+# -------------------
+
+- name: Download Docker install script
+  ansible.builtin.get_url:
+    url: https://get.docker.com
+    dest: /tmp/get-docker.sh
+    mode: '0755'
+
+- name: Run Docker install script
+  ansible.builtin.command: sh /tmp/get-docker.sh
+  args:
+    creates: /usr/bin/docker
+
+- name: Ensure Docker service is started and enabled
+  ansible.builtin.systemd:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Add admin user to docker group
+  become: true
+  ansible.builtin.user:
+    name: admin
+    groups: docker
+    append: true
+
+- name: Copy traefik.yml file
+  copy:
+    src: traefik.yml 
+    dest: ./traefik.yml
+    owner: admin
+    group: admin
+    mode: '0644'
+
+- name: Check if acme.json exists
+  stat:
+    path: ./acme.json
+  register: acme_file
+
+- name: Touch acme.json
+  file:
+    path: ./acme.json
+    state: touch
+    owner: admin
+    group: admin
+    mode: '0600'
+  when: not acme_file.stat.exists
+
+- name: Check if dynamic.yml exists
+  stat:
+    path: ./dynamic.yml
+  register: dynamic_file
+
+- name: Touch dynamic.yml
+  file:
+    path: ./dynamic.yml
+    state: touch
+    owner: admin
+    group: admin
+    mode: '0640'
+  when: not dynamic_file.stat.exists
+
+- name: Copy docker-compose.yml file
+  copy:
+    src: docker-compose.yml
+    dest: ./docker-compose.yml
+    owner: admin
+    group: admin
+    mode: '0640'

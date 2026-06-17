@@ -1,0 +1,5 @@
+ansible_user: bastion
+ansible_ssh_private_key_file: ~/.ssh/bastion-sshkey
+ansible_port: 4242
+ansible_ssh_common_args: null
+

@@ -1,0 +1,24 @@
+# dynamic.yml file for master eu-west-3a
+
+- name: Copy Traefik dynamic configuration
+  copy:
+    src: dynamic.yml
+    dest: ./dynamic.yml
+    owner: admin
+    group: admin
+    mode: '0640'
+  when: hostvars[inventory_hostname].leader | default(false) | bool
+
+- name: Apply Traefik docker-compose
+  community.docker.docker_compose_v2:
+    project_src: /home/admin
+    state: present
+
+- name: Check Traefik status
+  command: docker ps --filter "name=traefik"
+  register: traefik_ps
+  changed_when: false
+
+- debug:
+    var: traefik_ps.stdout
+

@@ -1,0 +1,147 @@
+# ------------------------------------ 
+# Apt cache 
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+
+# ------------------------------------ 
+# Install packages
+
+- name: Install some packages
+  apt:
+    name:
+      - fail2ban
+      - htop
+      - netcat-openbsd
+    state: present
+    update_cache: yes
+
+# ------------------------------------
+#  Create bastion user
+   
+- name: Ensure bastion user exists
+  ansible.builtin.user:
+    name: bastion
+    home: /home/bastion
+    shell: /bin/bash
+    create_home: yes
+    state: present
+
+# ------------------------------------
+# Access SSH for bastion user
+ 
+- name: Add SSH key for bastion
+  ansible.builtin.authorized_key:
+    user: bastion
+    key: "{{ lookup('file', bastion_pub_key_path) }}"
+
+
+# ------------------------------------
+# AWS sudoers method
+# sudoers bastion (only one granted on this machine
+ 
+- name: Add bastion to sudoers
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers.d/90-cloud-init-users
+    line: "bastion ALL=(ALL) NOPASSWD:ALL"
+    create: yes
+    state: present
+    validate: '/usr/sbin/visudo -cf %s'
+
+# ------------------------------------
+# Docker installation (monitoring prometheus)
+# ------------------------------------
+# ------------------------------------
+# Install Docker (official Docker script)
+
+- name: Download Docker install script
+  ansible.builtin.get_url:
+    url: https://get.docker.com
+    dest: /tmp/get-docker.sh
+    mode: '0755'
+
+- name: Run Docker install script
+  ansible.builtin.command: sh /tmp/get-docker.sh
+  args:
+    creates: /usr/bin/docker
+
+- name: Ensure Docker service is started and enabled
+  ansible.builtin.systemd:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Add bastion user to docker group
+  become: true
+  ansible.builtin.user:
+    name: bastion
+    groups: docker
+    append: true
+
+# ------------------------------------
+# Hardening SSH - TCP/4242 listen port
+# ------------------------------------
+
+- name: Set SSH Port - TCP/4242
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?Port'
+    line: 'Port 4242'
+    state: present
+    backup: yes
+
+- name: Disable root login
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?PermitRootLogin'
+    line: 'PermitRootLogin no'
+    state: present
+
+- name: Disable password authentication
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?PasswordAuthentication'
+    line: 'PasswordAuthentication no'
+    state: present
+
+- name: Allow only bastion user
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?AllowUsers'
+    #line: 'AllowUsers admin bastion'
+    line: 'AllowUsers bastion'
+    state: present
+
+- name: Disable SSH tunneling
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?PermitTunnel'
+    line: 'PermitTunnel no'
+    state: present
+
+- name: Disable X11 forwarding
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?X11Forwarding'
+    line: 'X11Forwarding no'
+    state: present
+
+# ------------------------------------
+# Check configuration SSH
+# ------------------------------------
+
+- name: Validate SSH configuration
+  ansible.builtin.command: sshd -t
+
+# ------------------------------------
+# Restart SSH services
+# ------------------------------------
+
+- name: Restart SSH service (async)
+  ansible.builtin.systemd:
+    name: ssh
+    state: restarted
+  async: 1
+  poll: 0
+  ignore_errors: true

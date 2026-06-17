@@ -1,0 +1,18 @@
+# ------------------------------------
+# Check configuration SSH
+# ------------------------------------
+
+- name: Validate SSH configuration
+  ansible.builtin.command: sshd -t
+  become: true
+
+- name: Check SSH is listening on 4242 as bastion
+  ansible.builtin.shell: ss -lnt | grep ':4242'
+  register: ssh_ports
+  changed_when: false
+
+- name: Assert SSH port 4242 is open
+  ansible.builtin.assert:
+    that:
+      - "'4242' in ssh_ports.stdout"
+

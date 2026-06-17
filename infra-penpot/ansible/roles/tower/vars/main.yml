@@ -1,0 +1,2 @@
+# roles/bastion/common/vars/main.yml
+bastion_pub_key_path: "{{ playbook_dir }}/roles/bastion/files/bastion-sshkey.pub"

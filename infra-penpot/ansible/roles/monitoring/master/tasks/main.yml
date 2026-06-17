@@ -1,0 +1,249 @@
+# ------------------------------------
+# Prometheus monitoring 
+# ------------------------------------
+
+# ------------------------------------
+# User creation
+
+- name: Prometheus user creation (no home - no shell)
+  ansible.builtin.user:
+    name: prometheus
+    shell: /usr/sbin/nologin
+    create_home: false
+    system: true
+
+- name: Add admin user to prometheus group
+  become: true
+  ansible.builtin.user:
+    name: admin
+    groups: prometheus
+    append: true
+
+# ------------------------------------
+# Dowload prometheus
+
+- name: Check if Prometheus directory exists
+  ansible.builtin.stat:
+    path: "/{{ prometheus_base_dir }}/prometheus-{{ prometheus_version }}.{{ prometheus_arch }}"
+  register: prometheus_dir
+
+- name: Download Prometheus archive
+  get_url:
+    url: "https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.{{ prometheus_arch }}.tar.gz"
+    dest: "/tmp/prometheus-{{ prometheus_version }}.{{ prometheus_arch }}.tar.gz"
+    mode: '0644'
+  when: not prometheus_dir.stat.exists
+
+- name: Extract Prometheus archive to /opt
+  unarchive:
+    src: "/tmp/prometheus-{{ prometheus_version }}.{{ prometheus_arch }}.tar.gz"
+    dest: "{{ prometheus_base_dir }}"
+    remote_src: yes
+    creates: "{{ prometheus_base_dir }}/prometheus-{{ prometheus_version }}.{{ prometheus_arch }}"
+
+# ------------------------------------
+# Prometheus link
+
+- name: Create symlink /opt/prometheus
+  file:
+    src: "{{ prometheus_base_dir }}/prometheus-{{ prometheus_version }}.{{ prometheus_arch }}"
+    dest: "{{ prometheus_base_dir }}/prometheus"
+    state: link
+    force: yes
+
+# ------------------------------------
+# Prometheus tuning
+
+- name: Create Prometheus data directory
+  ansible.builtin.file:
+    path: /opt/prometheus/data
+    state: directory
+    owner: 65534
+    group: 65534
+    mode: '0777'
+
+# ------------------------------------
+# Prometheus config
+
+- name: Deploy prometheus config Yaml
+  ansible.builtin.copy:
+    src: "{{ prometheus_config }}"
+    dest: "{{ prometheus_base_dir }}/{{ prometheus_user }}/{{ prometheus_config }}"
+    owner: "{{ prometheus_user }}"
+    group: "{{ prometheus_group }}"
+    mode: '0644'
+
+# ------------------------------------
+# Dowload node exporter
+
+- name: Check if node_exporter directory exists
+  ansible.builtin.stat:
+    path: "/{{ prometheus_base_dir }}/node_exporter-{{ node_exporter_version }}.{{ prometheus_arch }}"
+  register: node_exporter_dir
+
+- name: Download node_exporter archive
+  get_url:
+    url: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.{{ prometheus_arch }}.tar.gz"
+    dest: "/tmp/node_exporter-{{ node_exporter_version }}.{{ prometheus_arch }}.tar.gz"
+    mode: '0644'
+  when: not node_exporter_dir.stat.exists
+
+- name: Extract node_exporter archive to /opt
+  unarchive:
+    src: "/tmp/node_exporter-{{ node_exporter_version }}.{{ prometheus_arch }}.tar.gz"
+    dest: "{{ prometheus_base_dir }}"
+    remote_src: yes
+    creates: "{{ prometheus_base_dir }}/node_exporter-{{ node_exporter_version }}.{{ prometheus_arch }}"
+
+# ------------------------------------
+# Node_exporter link
+
+- name: Create symlink /opt/node_exporter
+  file:
+    src: "{{ prometheus_base_dir }}/node_exporter-{{ node_exporter_version }}.{{ prometheus_arch }}"
+    dest: "{{ prometheus_base_dir }}/node_exporter"
+    state: link
+    force: yes
+
+# ------------------------------------
+# Dowload alertmanager
+
+- name: Check if alertmanager directory exists
+  ansible.builtin.stat:
+    path: "/{{ prometheus_base_dir }}/alertmanager-{{ alertmanager_version }}.{{ prometheus_arch }}"
+  register: alertmanager_dir
+
+- name: Download alertmanager archive
+  get_url:
+    url: "https://github.com/prometheus/alertmanager/releases/download/v{{ alertmanager_version }}/alertmanager-{{ alertmanager_version }}.{{ prometheus_arch }}.tar.gz"
+    dest: "/tmp/alertmanager-{{ alertmanager_version }}.{{ prometheus_arch }}.tar.gz"
+    mode: '0644'
+  when: not alertmanager_dir.stat.exists
+
+- name: Extract alertmanager archive to /opt
+  unarchive:
+    src: "/tmp/alertmanager-{{ alertmanager_version }}.{{ prometheus_arch }}.tar.gz"
+    dest: "{{ prometheus_base_dir }}"
+    remote_src: yes
+    creates: "{{ prometheus_base_dir }}/alertmanager-{{ alertmanager_version }}.{{ prometheus_arch }}"
+
+# ------------------------------------
+# Node_exporter link and ownership
+
+- name: Create symlink /opt/alertmanager
+  file:
+    src: "{{ prometheus_base_dir }}/alertmanager-{{ alertmanager_version }}.{{ prometheus_arch }}"
+    dest: "{{ prometheus_base_dir }}/alertmanager"
+    state: link
+    force: yes
+
+- name: Set ownership on Prometheus directories
+  file:
+    path: "{{ prometheus_base_dir }}/{{ item }}"
+    owner: "{{ prometheus_user }}"
+    group: "{{ prometheus_group }}"
+    recurse: yes
+  loop:
+    - "prometheus-{{ prometheus_version }}.{{ prometheus_arch }}"
+    - "node_exporter-{{ node_exporter_version }}.{{ prometheus_arch }}"
+    - "alertmanager-{{ alertmanager_version }}.{{ prometheus_arch }}"
+
+- name: Set ownership on symlink
+  file:
+    path: "/opt/{{ item }}"
+    owner: "{{ prometheus_user }}"
+    group: "{{ prometheus_group }}"
+    state: link
+    follow: no
+  loop:
+    - "prometheus"
+    - "node_exporter"
+    - "alertmanager"
+
+# ------------------------------------
+# Systemctl part - svc prometheus / node / alertmanager
+
+- name: Copy systemd service files for monitoring
+  ansible.builtin.copy:
+    src: "{{ item }}.service" 
+    dest: "/etc/systemd/system/{{ item }}.service"
+    owner: root
+    group: root
+    mode: '0644'
+  loop:
+    - prometheus
+    - node_exporter
+    - alertmanager
+  notify: Reload systemd
+
+- name: Enable and start monitoring services
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  loop:
+    - prometheus
+    - node_exporter
+    - alertmanager
+
+# ------------------------------------
+# Cleaning unused packages
+
+- name: Remove prometheus archive
+  file:
+    path: "/tmp/prometheus-{{ prometheus_version }}.{{ prometheus_arch }}.tar.gz"
+    state: absent
+
+- name: Remove node_exporter archive
+  file:
+    path: "/tmp/node_exporter-{{ node_exporter_version }}.{{ prometheus_arch }}.tar.gz"
+    state: absent
+
+- name: Remove alertmanager archive
+  file:
+    path: "/tmp/alertmanager-{{ alertmanager_version }}.{{ prometheus_arch }}.tar.gz"
+    state: absent
+
+# ------------------------------------
+# Grafan part
+# ------------------------------------
+
+- name: Ensure directory for Grafana keyrings exists
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+
+- name: Download Grafana GPG key
+  get_url:
+    url: https://apt.grafana.com/gpg.key
+    dest: /etc/apt/keyrings/grafana.gpg
+    mode: '0644'
+
+- name: Add Grafana stable repository (deb822 style)
+  deb822_repository:
+    name: grafana-stable
+    uris:
+      - https://apt.grafana.com
+    suites:
+      - stable
+    components:
+      - main
+    signed_by: /etc/apt/keyrings/grafana.gpg
+    state: present
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+
+- name: Install Grafana
+  apt:
+    name: grafana
+    state: present
+
+- name: Ensure Grafana service is started and enabled
+  ansible.builtin.systemd:
+    name: grafana-server
+    state: started
+    enabled: yes
+
